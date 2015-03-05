@@ -5,7 +5,7 @@
  */
 package dssat;
 
-import static dssat.DSSATMain.weather_historic_daily;
+//import static dssat.DSSATMain.weather_historic_daily;
 import java.awt.Frame;
 import java.io.File;
 import java.io.IOException;

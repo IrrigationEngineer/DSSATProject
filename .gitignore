@@ -62,3 +62,21 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+/DSSATJavaFX/JavaFXApplication2/nbproject/private/
+/DSSATJavaFX/JavaFXApplication2/dist/
+/DSSATJavaFX/JavaFXApplication2/build/
+/DSSATJavaFX/DSSATXBuilder/nbproject/private/
+/DSSATJavaFX/DSSATXBuilder/build/
+/DSSATJavaFX/DSSATXBuilder/dist/
+/DSSATJavaFX/JavaFXApplication4/nbproject/private/
+/DSSATJavaFX/JavaFXApplication1/nbproject/private/
+/DSSATJavaFX/JavaFXApplication1/build/
+/DSSATJavaFX/JavaFXApplication1/dist/
+/DSSATJavaFX/JavaFXApplication6/nbproject/private/
+/DSSATJavaFX/JavaFXApplication6/build/
+/DSSATJavaFX/JavaFXApplication6/dist/
+/DSSATJavaFX/JavaFXApplication7/nbproject/private/
+/DSSATJavaFX/JavaFXApplication7-Preloader/nbproject/private/
+/DSSATJavaFX/JavaFXApplication8/nbproject/private/
+/DSSATJavaFX/JavaFXApplication10/nbproject/private/
+/DSSATJavaFX/JavaFXApplication10/build/
