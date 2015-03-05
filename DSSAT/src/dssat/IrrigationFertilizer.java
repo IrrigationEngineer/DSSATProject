@@ -239,7 +239,10 @@ public class IrrigationFertilizer extends javax.swing.JFrame {
         jLabel16 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jFertilizerInfoTable = new javax.swing.JTable();
-        jButton1 = new javax.swing.JButton();
+        bAdd = new javax.swing.JButton();
+        bUpdate = new javax.swing.JButton();
+        bDelete = new javax.swing.JButton();
+        warningMessaage = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setPreferredSize(Toolkit.getDefaultToolkit().getScreenSize());
@@ -397,14 +400,35 @@ public class IrrigationFertilizer extends javax.swing.JFrame {
                 "Fertilization Date", "Fertilization Material", "Fertilization Method", "Rate Per Application"
             }
         ));
-        jScrollPane1.setViewportView(jFertilizerInfoTable);
-
-        jButton1.setText("Add");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+        jFertilizerInfoTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jFertilizerInfoTableMouseClicked(evt);
             }
         });
+        jScrollPane1.setViewportView(jFertilizerInfoTable);
+
+        bAdd.setText("Add");
+        bAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bAddActionPerformed(evt);
+            }
+        });
+
+        bUpdate.setText("Update");
+        bUpdate.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bUpdateActionPerformed(evt);
+            }
+        });
+
+        bDelete.setText("Delete");
+        bDelete.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bDeleteActionPerformed(evt);
+            }
+        });
+
+        warningMessaage.setForeground(new java.awt.Color(255, 0, 0));
 
         javax.swing.GroupLayout jPanel4Layout = new javax.swing.GroupLayout(jPanel4);
         jPanel4.setLayout(jPanel4Layout);
@@ -417,17 +441,22 @@ public class IrrigationFertilizer extends javax.swing.JFrame {
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)
                         .addContainerGap())
                     .addGroup(jPanel4Layout.createSequentialGroup()
-                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(jPanel4Layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGap(77, 77, 77)
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(jLabel13, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel12, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jLabel16)
-                                    .addComponent(jLabel10))
-                                .addGap(73, 73, 73)
+                                    .addComponent(jLabel10)))
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGap(28, 28, 28)
+                                .addComponent(bAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(30, 30, 30)
+                                .addComponent(bUpdate)))
+                        .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGap(62, 62, 62)
                                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(jPanel4Layout.createSequentialGroup()
                                         .addComponent(jTextRatePerApplication, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -436,8 +465,16 @@ public class IrrigationFertilizer extends javax.swing.JFrame {
                                         .addGap(55, 55, 55))
                                     .addComponent(jComboBoxFertMethod, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                     .addComponent(jComboBoxFertMaterial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
-                        .addGap(28, 28, 28))))
+                                    .addComponent(jDateChooser1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                                .addGap(28, 28, 28))
+                            .addGroup(jPanel4Layout.createSequentialGroup()
+                                .addGap(30, 30, 30)
+                                .addComponent(bDelete)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(jPanel4Layout.createSequentialGroup()
+                        .addGap(28, 28, 28)
+                        .addComponent(warningMessaage, javax.swing.GroupLayout.PREFERRED_SIZE, 485, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
         jPanel4Layout.setVerticalGroup(
             jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -461,11 +498,16 @@ public class IrrigationFertilizer extends javax.swing.JFrame {
                     .addComponent(jLabel10)
                     .addComponent(jTextRatePerApplication, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel11))
-                .addGap(17, 17, 17)
-                .addComponent(jButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGap(22, 22, 22)
+                .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(bAdd)
+                    .addComponent(bUpdate)
+                    .addComponent(bDelete))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(warningMessaage, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(7, 7, 7)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(369, 369, 369))
+                .addGap(343, 343, 343))
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -536,15 +578,80 @@ public class IrrigationFertilizer extends javax.swing.JFrame {
         wthfile.WriteToFile();
     }//GEN-LAST:event_jButtonFinishActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void bAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bAddActionPerformed
         // TODO add your handling code here:
-        
+        warningMessaage.setText("");
         DefaultTableModel model = (DefaultTableModel)jFertilizerInfoTable.getModel();
-        if (!jTextRatePerApplication.getText().trim().equals("")){
-               model.insertRow(0,new Object [] {jDateChooser1.getDate().toString(), jComboBoxFertMaterial.getSelectedItem().toString(), jComboBoxFertMethod.getSelectedItem().toString(), jTextRatePerApplication.getText()});
-        } 
+        if (jTextRatePerApplication.getText().trim().equals("")){               
+            warningMessaage.setText("Rate Per Application should not be left blank.");
+            return;
+        } else if (jDateChooser1.getDate().toString().trim().equals("")){            
+            warningMessaage.setText("Fertilization Date should not be left blank.");
+            return;
+        }          
+        model.insertRow(0,new Object [] {jDateChooser1.getDate().toString(), jComboBoxFertMaterial.getSelectedItem().toString(), jComboBoxFertMethod.getSelectedItem().toString(), jTextRatePerApplication.getText()});
+    }//GEN-LAST:event_bAddActionPerformed
 
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void bUpdateActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bUpdateActionPerformed
+        // TODO add your handling code here:
+        warningMessaage.setText("");
+        DefaultTableModel model = (DefaultTableModel)jFertilizerInfoTable.getModel();
+        if (jFertilizerInfoTable.getSelectedRow()==-1) {
+            
+            if (jFertilizerInfoTable.getRowCount()==0)
+            {
+                warningMessaage.setText("Fertilization Table is empty.");                
+            } else  {
+                
+                warningMessaage.setText("Row is not selected from Fertilization Table.");  
+            }
+        } else {
+            
+            
+            if (jTextRatePerApplication.getText().trim().equals("")){               
+                warningMessaage.setText("Rate Per Application should not be left blank.");
+                return;
+            } else if (jDateChooser1.getDate().toString().trim().equals("")){            
+                warningMessaage.setText("Fertilization Date should not be left blank.");
+                return;
+            } 
+            
+            model.setValueAt(jDateChooser1.getDate().toString(), jFertilizerInfoTable.getSelectedRow(), 0);
+            model.setValueAt(jComboBoxFertMaterial.getSelectedItem().toString(), jFertilizerInfoTable.getSelectedRow(), 1);
+            model.setValueAt(jComboBoxFertMethod.getSelectedItem().toString(), jFertilizerInfoTable.getSelectedRow(), 2);
+            model.setValueAt(jTextRatePerApplication.getText(), jFertilizerInfoTable.getSelectedRow(), 3);            
+        }
+    }//GEN-LAST:event_bUpdateActionPerformed
+
+    private void bDeleteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bDeleteActionPerformed
+        // TODO add your handling code here:
+        warningMessaage.setText("");
+        DefaultTableModel model = (DefaultTableModel)jFertilizerInfoTable.getModel();
+        if (jFertilizerInfoTable.getSelectedRow()==-1) {
+            
+            if (jFertilizerInfoTable.getRowCount()==0)
+            {
+                warningMessaage.setText("Fertilization Table is empty.");                
+            } else  {
+                
+                warningMessaage.setText("Row is not selected from Fertilization Table.");  
+            }
+        } else {
+            model.removeRow(jFertilizerInfoTable.getSelectedRow());
+        }
+    }//GEN-LAST:event_bDeleteActionPerformed
+
+    private void jFertilizerInfoTableMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jFertilizerInfoTableMouseClicked
+        // TODO add your handling code here:
+        warningMessaage.setText("");
+        DefaultTableModel model = (DefaultTableModel)jFertilizerInfoTable.getModel();
+        Date date = new Date (model.getValueAt(jFertilizerInfoTable.getSelectedRow(), 0).toString());
+        jDateChooser1.setDate(date);
+        jComboBoxFertMaterial.setSelectedItem(model.getValueAt(jFertilizerInfoTable.getSelectedRow(), 1).toString());
+        jComboBoxFertMethod.setSelectedItem(model.getValueAt(jFertilizerInfoTable.getSelectedRow(), 2).toString());
+        jTextRatePerApplication.setText(model.getValueAt(jFertilizerInfoTable.getSelectedRow(), 3).toString());     
+       
+    }//GEN-LAST:event_jFertilizerInfoTableMouseClicked
 
     /**
      * @param args the command line arguments
@@ -582,7 +689,9 @@ public class IrrigationFertilizer extends javax.swing.JFrame {
     }
     private CommonMenuBar jMenuBar1;
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton bAdd;
+    private javax.swing.JButton bDelete;
+    private javax.swing.JButton bUpdate;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButtonFinish;
     private javax.swing.JComboBox jComboBoxFertMaterial;
@@ -615,5 +724,6 @@ public class IrrigationFertilizer extends javax.swing.JFrame {
     private javax.swing.JTextField jTextField4;
     private javax.swing.JTextField jTextField6;
     private javax.swing.JTextField jTextRatePerApplication;
+    private javax.swing.JLabel warningMessaage;
     // End of variables declaration//GEN-END:variables
 }
