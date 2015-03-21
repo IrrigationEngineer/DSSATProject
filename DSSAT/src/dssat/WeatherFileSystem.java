@@ -5,6 +5,9 @@
  */
 package dssat;
 
+import static dssat.DSSATMain.curdirpath;
+import static dssat.DSSATMain.datadir;
+import static dssat.DSSATMain.dirseprator;
 import java.io.File;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -64,14 +67,16 @@ public class WeatherFileSystem extends BaseFileSystem{
         
         // prepare the file name from the organization name and the site index number and then write to that file
         
-        String orgName= incache.get("Organization");
+        String orgName= incache.get("Site");
         String siteIndex =  incache.get("SiteIndex");
         String year = incache.get("PlantingYear");
         
         Integer plantingyear = Integer.parseInt(year);
         Integer twodigyr = plantingyear % 100;
         String wthFileName = orgName + siteIndex + twodigyr + "01" +  ".WTH";
-        System.out.println(wthFileName);
+        System.out.println(wthFileName);       
+        
+        wthFileName = datadir + dirseprator + wthFileName;
         File file = new File (wthFileName);
         String writeBuffer = null;
         
@@ -102,7 +107,7 @@ public class WeatherFileSystem extends BaseFileSystem{
              pr.println(writeBuffer);
              writeBuffer = new String ();
 
-             DBConnect weather_historic_daily = new DBConnect (ServerDetails.SERVER_NUM_RONLY, ServerDetails.weather_historic_daily_dbname);
+             /*DBConnect weather_historic_daily = new DBConnect (ServerDetails.SERVER_NUM_RONLY, ServerDetails.weather_historic_daily_dbname);
              StringBuilder query = new StringBuilder (
                                     "SELECT * FROM FAWN_historic_daily_20140212 " +
                                     "WHERE ( yyyy BETWEEN " + (plantingyear-10) + " AND "  + plantingyear.toString() + ")" +
@@ -145,7 +150,7 @@ public class WeatherFileSystem extends BaseFileSystem{
                  
              } catch (SQLException e) {                 
                  e.printStackTrace();
-             }
+             }*/
   
         } catch (IOException e) {        
             e.printStackTrace();

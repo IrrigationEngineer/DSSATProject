@@ -122,7 +122,7 @@ public class FileOperations {
              pr.println(writeBuffer);
              writeBuffer = new String ();
 
-             DBConnect weather_historic_daily = new DBConnect (ServerDetails.SERVER_NUM_RONLY, ServerDetails.weather_historic_daily_dbname);
+             /*DBConnect weather_historic_daily = new DBConnect (ServerDetails.SERVER_NUM_RONLY, ServerDetails.weather_historic_daily_dbname);
              StringBuilder query = new StringBuilder (
                                     "SELECT * FROM FAWN_historic_daily_20140212 " +
                                     "WHERE ( yyyy BETWEEN " + (plantingyear-10) + " AND "  + plantingyear.toString() + ")" +
@@ -165,7 +165,7 @@ public class FileOperations {
                  
              } catch (SQLException e) {                 
                  e.printStackTrace();
-             }
+             }*/
   
         } catch (IOException e) {        
             e.printStackTrace();
@@ -182,5 +182,14 @@ public class FileOperations {
             
             
         }       
-    }     
+    }
+    
+    public static void WriteToSiteFile (DSSATMain main)
+    {
+        
+        
+        
+    }
+    
+    
 }

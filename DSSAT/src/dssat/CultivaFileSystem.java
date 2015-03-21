@@ -5,7 +5,7 @@
  */
 package dssat;
 
-import static com.sun.org.apache.xalan.internal.xsltc.compiler.sym.OR;
+
 import static dssat.BaseFileSystem.fileName;
 import java.io.BufferedReader;
 import java.io.File;
