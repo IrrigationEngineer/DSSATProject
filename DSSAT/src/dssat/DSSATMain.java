@@ -505,9 +505,11 @@ public class DSSATMain extends javax.swing.JFrame {
         WeatherInfo = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         weatherStComboBox = new javax.swing.JComboBox();
+        jButton3 = new javax.swing.JButton();
         SoilInfo = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         soilSeriesCombobox = new javax.swing.JComboBox();
+        jButton4 = new javax.swing.JButton();
         CropInfo = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
@@ -716,6 +718,8 @@ public class DSSATMain extends javax.swing.JFrame {
             }
         });
 
+        jButton3.setText("View Weather File");
+
         javax.swing.GroupLayout WeatherInfoLayout = new javax.swing.GroupLayout(WeatherInfo);
         WeatherInfo.setLayout(WeatherInfoLayout);
         WeatherInfoLayout.setHorizontalGroup(
@@ -724,8 +728,10 @@ public class DSSATMain extends javax.swing.JFrame {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addGap(136, 136, 136)
-                .addComponent(weatherStComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(198, Short.MAX_VALUE))
+                .addGroup(WeatherInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton3)
+                    .addComponent(weatherStComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(193, Short.MAX_VALUE))
         );
         WeatherInfoLayout.setVerticalGroup(
             WeatherInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -735,14 +741,18 @@ public class DSSATMain extends javax.swing.JFrame {
                     .addGroup(WeatherInfoLayout.createSequentialGroup()
                         .addComponent(jLabel1)
                         .addGap(3, 3, 3))
-                    .addComponent(weatherStComboBox))
-                .addGap(164, 164, 164))
+                    .addComponent(weatherStComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton3)
+                .addContainerGap())
         );
 
         SoilInfo.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Soil Information", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Agency FB", 3, 16), new java.awt.Color(0, 51, 204))); // NOI18N
         SoilInfo.setPreferredSize(new java.awt.Dimension(620, 193));
 
         jLabel4.setText("Soil Series Name");
+
+        jButton4.setText("View Soil File");
 
         javax.swing.GroupLayout SoilInfoLayout = new javax.swing.GroupLayout(SoilInfo);
         SoilInfo.setLayout(SoilInfoLayout);
@@ -752,8 +762,10 @@ public class DSSATMain extends javax.swing.JFrame {
                 .addGap(19, 19, 19)
                 .addComponent(jLabel4)
                 .addGap(32, 32, 32)
-                .addComponent(soilSeriesCombobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(454, Short.MAX_VALUE))
+                .addGroup(SoilInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jButton4)
+                    .addComponent(soilSeriesCombobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(389, Short.MAX_VALUE))
         );
         SoilInfoLayout.setVerticalGroup(
             SoilInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -762,7 +774,9 @@ public class DSSATMain extends javax.swing.JFrame {
                 .addGroup(SoilInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(soilSeriesCombobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
-                .addContainerGap(140, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton4)
+                .addContainerGap(106, Short.MAX_VALUE))
         );
 
         CropInfo.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Crop", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Agency FB", 3, 16), new java.awt.Color(0, 51, 204))); // NOI18N
@@ -2176,6 +2190,8 @@ public class DSSATMain extends javax.swing.JFrame {
     private javax.swing.JTextField jBlockNameText;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
+    private javax.swing.JButton jButton4;
     private javax.swing.JComboBox jComboBox7;
     private javax.swing.JComboBox jComboBoxCropList;
     private javax.swing.JComboBox jComboBoxCultivar;
