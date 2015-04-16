@@ -8,9 +8,16 @@ package dssat;
 import static dssat.DSSATMain.curdirpath;
 import static dssat.DSSATMain.datadir;
 import static dssat.DSSATMain.dirseprator;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
@@ -73,7 +80,7 @@ public class WeatherFileSystem extends BaseFileSystem{
         
         Integer plantingyear = Integer.parseInt(year);
         Integer twodigyr = plantingyear % 100;
-        String wthFileName = orgName + siteIndex + twodigyr + "01" +  ".WTH";
+        String wthFileName = orgName  + twodigyr + "01" +  ".WTH";
         System.out.println(wthFileName);       
         
         wthFileName = datadir + dirseprator + wthFileName;
@@ -107,18 +114,44 @@ public class WeatherFileSystem extends BaseFileSystem{
              pr.println(writeBuffer);
              writeBuffer = new String ();
              
+             URL url = null;
+             InputStream is = null;
+             
              /*Bring the Weather details for last 10 Years and write the details to the WTH File. */
                try {
-			String urlStr="http://fawn.ifas.ufl.edu/scripts/fawndataserver.asp?sql=select%20datePart(yy,datetime)"+
-			"%20AS%20Year,%20FLOOR(AVG(soiltempavg)*100)/100%20as%20'SoilTYearlyAvg',count(soiltempavg)%20"+
-			"as%20'soilTCount'%20from%20weather%20where%20"+queryID+"%20and%20(datetime%20between%20'01/1/2004'"+
-			"%20and%20'12/31/2005')%20GROUP%20BY%20datePart(yy,datetime)%20ORDER%20BY%20datePart(yy,datetime)";
+
+                    String query = new String(
+                                "SELECT%20*%20FROM%20FAWN_historic_daily_20140212%20"+
+                                "WHERE%20(%20yyyy%20BETWEEN%20"+(plantingyear-10)+"%20AND%20"+plantingyear.toString()+")" +
+                                "%20AND%20(%20LocId%20=%20"+incache.get("StationLocationId")+")"+
+                                "%20ORDER%20BY%20yyyy%20DESC%20");
+
+                    String urlStr="http://abe.ufl.edu/bmpmodel/xmlread/rohit.php?sql="+query;
+
+                    //System.out.println(urlStr);
+                    URL uflconnection = new URL(urlStr);
+                    HttpURLConnection huc = (HttpURLConnection) uflconnection.openConnection();
+                    HttpURLConnection.setFollowRedirects(false);
+                    huc.setConnectTimeout(15 * 1000);
+                    huc.setRequestMethod("GET");
+                    huc.connect();
+                    InputStream input = huc.getInputStream();                    
+                    BufferedReader in = new BufferedReader(new InputStreamReader(input));                    
+                    String inputLine;
+                    while ((inputLine = in.readLine()) != null) {
+                           pr.println(inputLine);
+                    }
+                    in.close();
+                    //System.out.println("Created teh connection successfully");
+
+               } catch (MalformedURLException me) {
+			me.printStackTrace();
+			//return 21.4;
+		}catch (Exception e){
+                   e.printStackTrace();
+               }          
              /*DBConnect weather_historic_daily = new DBConnect (ServerDetails.SERVER_NUM_RONLY, ServerDetails.weather_historic_daily_dbname);
-             StringBuilder query = new StringBuilder (
-                                    "SELECT * FROM FAWN_historic_daily_20140212 " +
-                                    "WHERE ( yyyy BETWEEN " + (plantingyear-10) + " AND "  + plantingyear.toString() + ")" +
-                                    " AND ( LocId = " + incache.get("StationLocationId") + ")" +
-                                    " ORDER BY yyyy DESC ");
+             
 
             System.out.println (query);
              ResultSet result = weather_historic_daily.Execute (ServerDetails.weather_historic_daily_dbname, query.toString());
@@ -158,7 +191,7 @@ public class WeatherFileSystem extends BaseFileSystem{
                  e.printStackTrace();
              }*/
   
-        } catch (IOException e) {        
+        } catch (Exception e) {        
             e.printStackTrace();
         } finally {
             

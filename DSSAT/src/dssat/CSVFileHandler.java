@@ -127,10 +127,6 @@ public class CSVFileHandler {
         ArrayList<String> soilList = new  ArrayList<String> ();
         Set <String> soillistset = new  HashSet<String> ();        
         try {
-            //String filepath = DSSATMain.csvdirpath + "\\dssat_countywise_list_of_soils.csv";
-            //reader = new CSVReader(new FileReader(".\\data\\dssat_countywise_list_of_soils.csv"));
-            /*String filepath = csvdirpath +dirseprator+ "dssat_countywise_list_of_soils.csv";
-            reader = new CSVReader(new FileReader(filepath));*/
             reader = new CSVReader(new InputStreamReader(getClass().getResourceAsStream("/dssat/properties/csv/dssat_countywise_list_of_soils.csv")));
             while ((nextLine = reader.readNext()) != null) { 
                 String county = nextLine[1];                               
@@ -150,6 +146,31 @@ public class CSVFileHandler {
         LOGGER.log(Level.ALL, "Returning the sorted list of soils in a county...");
         return soilList;        
     }
+    
+    public String getSoilid (String countyName, String soilName) {
+        
+        String soil = null;     
+        String [] nextLine;
+        CSVReader reader;
+        //ArrayList<String> soilList = new  ArrayList<String> ();
+        //Set <String> soillistset = new  HashSet<String> ();        
+        try {
+            reader = new CSVReader(new InputStreamReader(getClass().getResourceAsStream("/dssat/properties/csv/dssat_countywise_list_of_soils.csv")));
+            while ((nextLine = reader.readNext()) != null) { 
+                String county = nextLine[1];  
+                //String soil = nextLine[4];
+                if ((county.isEmpty() == false && county.equals(countyName)) &&
+                    soilName.equals(nextLine[4])){                   
+                    // Parse the String     
+                    soil = nextLine[7];
+                }
+            }            
+        } catch (IOException e) {
+            e.printStackTrace();
+        }        
+        return soil;        
+    }
+    
     
     // Implemented
     public ArrayList getCountyList_GlobalDB ()

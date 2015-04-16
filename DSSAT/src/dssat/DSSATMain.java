@@ -5,6 +5,8 @@
  */
 package dssat;
 import com.opencsv.CSVReader;
+import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagLayout;
 import java.awt.Image;
@@ -70,6 +72,7 @@ public class DSSATMain extends javax.swing.JFrame {
     public static String datadir;
     public static String dirseprator;
     static HashMap<String, String> datamap = new HashMap<String, String> ();
+    CSVFileHandler mycsvfile = new CSVFileHandler ();
     
     static IrrigationFertilizer irrigationframe;
     
@@ -107,8 +110,8 @@ public class DSSATMain extends javax.swing.JFrame {
     private void initializeTree ()
     {        
         //Read Project File and get the array of Paths
-        CSVFileHandler csvfile = new CSVFileHandler ();
-        HashMap <String, HashMap<String, HashMap<String, String>>> mymap = csvfile.ReadSitesFile ();
+        //CSVFileHandler csvfile = new CSVFileHandler ();
+        HashMap <String, HashMap<String, HashMap<String, String>>> mymap = mycsvfile.ReadSitesFile ();
         jProjectExplorer.removeAll();
         // Read the sitesinfo.sites file and read the data from the file. 
         DefaultTreeModel model = (DefaultTreeModel) jProjectExplorer.getModel();
@@ -357,12 +360,12 @@ public class DSSATMain extends javax.swing.JFrame {
         
         //soil_db = new DBConnect (ServerDetails.SERVER_NUM_RW, ServerDetails.soil_dbname);
         LOGGER.log(Level.ALL, "Initializing soil information....");
-        CSVFileHandler csvfile = new CSVFileHandler ();
+        //CSVFileHandler csvfile = new CSVFileHandler ();
         
         // From the global db initialize the county comboBox
         ArrayList <String> soilList = null;
         ArrayList <String> countyList = null;
-        countyList = csvfile.getCountyList_SoilDB();
+        countyList = mycsvfile.getCountyList_SoilDB();
         Collections.sort(countyList);
         
         /*for (int i = 0; i < countyList.size(); i++) {            
@@ -373,7 +376,7 @@ public class DSSATMain extends javax.swing.JFrame {
         // String countyName = (String) soilInfoCountyCombobox.getSelectedItem();
         // soilList = csvfile.getCountyBasedSoilList_SoilDB(countyList.get(0));
         String countName = (String)countyNameGlobal.getSelectedItem();        
-        soilList = csvfile.getCountyBasedSoilList_SoilDB(countName);
+        soilList = mycsvfile.getCountyBasedSoilList_SoilDB(countName);
         
 
         for (int i = 0; i < soilList.size(); i++) {
@@ -384,6 +387,32 @@ public class DSSATMain extends javax.swing.JFrame {
     }
     
     
+    private void GenerateSoilData () {
+	
+	/*
+	 * Below are the steps to prepare the Soil File
+	 * 
+	 * 1. Get the Soil name from the soil Combobox
+	 * 2. Get the Soild ID 
+	 * 3. Need to open the FL.SOL file
+	 * 4. Read the soil file line by line and Find the SOIL Id section in the file. 
+	 * 5. Read the whole section till you reach the next Soil ID details. 
+	 * 6. Now you Open a file to write the data 
+	 * 7. Write the data to the New soild file. 
+	 * 8. Close teh file if you need to close the file. 	 * 
+	 * */
+        
+        //CSVFileHandler csvfile = new CSVFileHandler ();
+        
+        // Get soild name from the combo box
+        String soilName = (String)soilSeriesCombobox.getSelectedItem();
+        String countyName = (String)countyNameGlobal.getSelectedItem();
+        // Pass the soild name to the method and get back the Soil Id
+        String soilId = mycsvfile.getSoilid(countyName, soilName);        
+        SoilDataGenerator sdg = new SoilDataGenerator();
+        sdg.ReadSoilData (countyName, soilId);
+    }
+    
     private void initWeatherHistoric  ()
     {
         //weather_historic_daily = new DBConnect (ServerDetails.SERVER_NUM_RONLY, ServerDetails.weather_historic_daily_dbname);
@@ -392,10 +421,10 @@ public class DSSATMain extends javax.swing.JFrame {
     private void initGlobalDBInfo  ()
     {        
         LOGGER.log(Level.ALL, "Initializing Global Data information....");
-        CSVFileHandler csvfile = new CSVFileHandler ();
+        //CSVFileHandler csvfile = new CSVFileHandler ();
         // From the global db initialize the county comboBox
         ArrayList <String> countyList = null;
-        countyList = csvfile.getCountyList_GlobalDB();
+        countyList = mycsvfile.getCountyList_GlobalDB();
         if (countyList == null) {
             LOGGER.log(Level.ALL, "County List is not initialized. Exiting the application!");
             System.exit(0);
@@ -415,10 +444,10 @@ public class DSSATMain extends javax.swing.JFrame {
         // weather stations based on the first item in the combobox 
 
         Location countypos = new Location ();
-        csvfile.getCountyLocation_GlobalDB (countyList.get(0), countypos); 
+        mycsvfile.getCountyLocation_GlobalDB (countyList.get(0), countypos); 
                  
         ArrayList<String> weatherstations = null;
-        weatherstations = csvfile.getWeatherStations_GlobalDB(countypos);
+        weatherstations = mycsvfile.getWeatherStations_GlobalDB(countypos);
         Collections.sort(weatherstations);
         
         int itemCount = weatherStComboBox.getItemCount();
@@ -502,14 +531,16 @@ public class DSSATMain extends javax.swing.JFrame {
         jLabel30 = new javax.swing.JLabel();
         jBlockNameText = new javax.swing.JTextField();
         jZoneNameText = new javax.swing.JTextField();
+        jButton1 = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         WeatherInfo = new javax.swing.JPanel();
         jLabel1 = new javax.swing.JLabel();
         weatherStComboBox = new javax.swing.JComboBox();
-        jButton3 = new javax.swing.JButton();
+        jButtonOpenWeatherFile = new javax.swing.JButton();
         SoilInfo = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         soilSeriesCombobox = new javax.swing.JComboBox();
-        jButton4 = new javax.swing.JButton();
+        jButtonDisplaySoilFile = new javax.swing.JButton();
         CropInfo = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
@@ -539,8 +570,7 @@ public class DSSATMain extends javax.swing.JFrame {
         jTextField5 = new javax.swing.JTextField();
         jLabel21 = new javax.swing.JLabel();
         jNextButton = new javax.swing.JButton();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        jLabel2 = new javax.swing.JLabel();
         IrrigationFertilizerPanel = new javax.swing.JPanel();
         pIrrigationPanel = new javax.swing.JPanel();
         jLabel49 = new javax.swing.JLabel();
@@ -558,6 +588,8 @@ public class DSSATMain extends javax.swing.JFrame {
         jLabel57 = new javax.swing.JLabel();
         jTextField17 = new javax.swing.JTextField();
         jLabel58 = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        jFertilizerInfoTable = new javax.swing.JTable();
         pFertilizerPanel = new javax.swing.JPanel();
         jLabel59 = new javax.swing.JLabel();
         jTextRatePerApplication = new javax.swing.JTextField();
@@ -568,15 +600,16 @@ public class DSSATMain extends javax.swing.JFrame {
         jComboBoxFertMethod = new javax.swing.JComboBox();
         jDateChooser3 = new com.toedter.calendar.JDateChooser();
         jLabel63 = new javax.swing.JLabel();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jFertilizerInfoTable = new javax.swing.JTable();
         bAdd = new javax.swing.JButton();
         bUpdate = new javax.swing.JButton();
         bDelete = new javax.swing.JButton();
         warningMessaage = new javax.swing.JLabel();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jFertilizerInfoTable1 = new javax.swing.JTable();
         pButtonPanel = new javax.swing.JPanel();
         bFinishButton = new javax.swing.JButton();
         bBackButton = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jProjectExplorer = new javax.swing.JTree();
         jMenuBarFields = new javax.swing.JMenuBar();
@@ -613,21 +646,27 @@ public class DSSATMain extends javax.swing.JFrame {
         jMainPanel.setAutoscrolls(true);
 
         jLabel27.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        jLabel27.setText("Site Name:");
+        jLabel27.setText("Site Name*");
 
+        jSiteNameText.setBackground(new java.awt.Color(204, 204, 255));
         jSiteNameText.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 jSiteNameTextActionPerformed(evt);
             }
         });
+        jSiteNameText.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jSiteNameTextKeyTyped(evt);
+            }
+        });
 
         jLabel25.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        jLabel25.setText("Planting Date :");
+        jLabel25.setText("Planting Date");
 
         jDateChooser1.setDateFormatString("MMM, dd, yyyy");
 
         jLabel23.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        jLabel23.setText("Your Location :");
+        jLabel23.setText("Your Location");
 
         countyNameGlobal.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -636,10 +675,14 @@ public class DSSATMain extends javax.swing.JFrame {
         });
 
         jLabel28.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        jLabel28.setText("Block Name:");
+        jLabel28.setText("Block Name*");
 
         jLabel30.setFont(new java.awt.Font("Tahoma", 1, 16)); // NOI18N
-        jLabel30.setText("Zone: ");
+        jLabel30.setText("Zone*");
+
+        jButton1.setText("Edit Block/Site");
+
+        jButton2.setText("Setup Sites");
 
         javax.swing.GroupLayout GeneralInformationLayout = new javax.swing.GroupLayout(GeneralInformation);
         GeneralInformation.setLayout(GeneralInformationLayout);
@@ -656,15 +699,19 @@ public class DSSATMain extends javax.swing.JFrame {
                     .addComponent(jSiteNameText, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jBlockNameText, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jZoneNameText, javax.swing.GroupLayout.PREFERRED_SIZE, 115, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(51, 51, 51)
+                .addGap(18, 18, 18)
+                .addGroup(GeneralInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 74, Short.MAX_VALUE)
                 .addGroup(GeneralInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel23, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel25, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(72, 72, 72)
+                    .addComponent(jLabel25, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel23, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 133, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
                 .addGroup(GeneralInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(countyNameGlobal, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(25, Short.MAX_VALUE))
+                    .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, 142, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(countyNameGlobal, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(33, 33, 33))
         );
 
         GeneralInformationLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jLabel23, jLabel25});
@@ -676,30 +723,30 @@ public class DSSATMain extends javax.swing.JFrame {
         GeneralInformationLayout.setVerticalGroup(
             GeneralInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(GeneralInformationLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addGroup(GeneralInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(GeneralInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(GeneralInformationLayout.createSequentialGroup()
+                        .addGap(15, 15, 15)
                         .addGroup(GeneralInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel27)
-                            .addComponent(jSiteNameText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(jSiteNameText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel25)
+                            .addComponent(jButton1))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(GeneralInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel28)
-                            .addComponent(jBlockNameText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                    .addGroup(GeneralInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGroup(GeneralInformationLayout.createSequentialGroup()
-                            .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(countyNameGlobal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGroup(GeneralInformationLayout.createSequentialGroup()
-                            .addComponent(jLabel25)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                            .addComponent(jBlockNameText, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton2)))
+                    .addGroup(GeneralInformationLayout.createSequentialGroup()
+                        .addGap(14, 14, 14)
+                        .addComponent(jDateChooser1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(GeneralInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(countyNameGlobal, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jLabel23))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(GeneralInformationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel30)
                     .addComponent(jZoneNameText, javax.swing.GroupLayout.PREFERRED_SIZE, 20, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap())
+                .addContainerGap(29, Short.MAX_VALUE))
         );
 
         GeneralInformationLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jLabel27, jLabel28, jLabel30});
@@ -718,7 +765,12 @@ public class DSSATMain extends javax.swing.JFrame {
             }
         });
 
-        jButton3.setText("View Weather File");
+        jButtonOpenWeatherFile.setText("View Weather File");
+        jButtonOpenWeatherFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonOpenWeatherFileActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout WeatherInfoLayout = new javax.swing.GroupLayout(WeatherInfo);
         WeatherInfo.setLayout(WeatherInfoLayout);
@@ -729,7 +781,7 @@ public class DSSATMain extends javax.swing.JFrame {
                 .addComponent(jLabel1)
                 .addGap(136, 136, 136)
                 .addGroup(WeatherInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton3)
+                    .addComponent(jButtonOpenWeatherFile)
                     .addComponent(weatherStComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(193, Short.MAX_VALUE))
         );
@@ -738,12 +790,10 @@ public class DSSATMain extends javax.swing.JFrame {
             .addGroup(WeatherInfoLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(WeatherInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(WeatherInfoLayout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addGap(3, 3, 3))
+                    .addComponent(jLabel1)
                     .addComponent(weatherStComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton3)
+                .addComponent(jButtonOpenWeatherFile)
                 .addContainerGap())
         );
 
@@ -752,7 +802,12 @@ public class DSSATMain extends javax.swing.JFrame {
 
         jLabel4.setText("Soil Series Name");
 
-        jButton4.setText("View Soil File");
+        jButtonDisplaySoilFile.setText("View Soil File");
+        jButtonDisplaySoilFile.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonDisplaySoilFileActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout SoilInfoLayout = new javax.swing.GroupLayout(SoilInfo);
         SoilInfo.setLayout(SoilInfoLayout);
@@ -763,7 +818,7 @@ public class DSSATMain extends javax.swing.JFrame {
                 .addComponent(jLabel4)
                 .addGap(32, 32, 32)
                 .addGroup(SoilInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton4)
+                    .addComponent(jButtonDisplaySoilFile)
                     .addComponent(soilSeriesCombobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(389, Short.MAX_VALUE))
         );
@@ -775,7 +830,7 @@ public class DSSATMain extends javax.swing.JFrame {
                     .addComponent(soilSeriesCombobox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel4))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton4)
+                .addComponent(jButtonDisplaySoilFile)
                 .addContainerGap(106, Short.MAX_VALUE))
         );
 
@@ -841,18 +896,18 @@ public class DSSATMain extends javax.swing.JFrame {
         BedSystemInfo.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Bed System", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Agency FB", 3, 16), new java.awt.Color(0, 51, 204))); // NOI18N
         BedSystemInfo.setPreferredSize(new java.awt.Dimension(620, 193));
 
-        jLabel11.setText("Bed Width");
+        jLabel11.setText("Bed Width*");
 
         jTextField2.setColumns(10);
 
         jLabel24.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
         jLabel24.setText("Inches");
 
-        jLabel13.setText("Plastic Mulch Color");
+        jLabel13.setText("Plastic Mulch Color*");
 
         jComboBox7.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "None", "Black", "Silver", "White", " " }));
 
-        jLabel12.setText("Bed Height");
+        jLabel12.setText("Bed Height*");
 
         jTextField6.setColumns(10);
 
@@ -867,21 +922,21 @@ public class DSSATMain extends javax.swing.JFrame {
 
         jComboBoxPlantingMethod.setModel(new javax.swing.DefaultComboBoxModel(new String[] { " " }));
 
-        jLabel17.setText("Planting Depth");
+        jLabel17.setText("Planting Depth*");
 
         jTextField4.setColumns(5);
 
         jLabel20.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
         jLabel20.setText("Inches");
 
-        jLabel16.setText("Planting Spacing in Row");
+        jLabel16.setText("Planting Spacing in Row*");
 
         jTextField3.setColumns(5);
 
         jLabel19.setFont(new java.awt.Font("Tahoma", 2, 11)); // NOI18N
         jLabel19.setText("Feet");
 
-        jLabel18.setText("Row Spacing");
+        jLabel18.setText("Row Spacing*");
 
         jTextField5.setColumns(5);
         jTextField5.addActionListener(new java.awt.event.ActionListener() {
@@ -911,7 +966,7 @@ public class DSSATMain extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(jLabel19, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(BedSystemInfoLayout.createSequentialGroup()
-                                .addComponent(jComboBoxPlantingMethod, 0, 82, Short.MAX_VALUE)
+                                .addComponent(jComboBoxPlantingMethod, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                 .addGap(12, 12, 12)))
                         .addGap(56, 56, 56)
                         .addGroup(BedSystemInfoLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1005,24 +1060,12 @@ public class DSSATMain extends javax.swing.JFrame {
             }
         });
 
-        jButton1.setText("Edit Form");
-
-        jButton2.setText("Setup Sites");
+        jLabel2.setForeground(new java.awt.Color(255, 51, 51));
 
         javax.swing.GroupLayout FieldPanelLayout = new javax.swing.GroupLayout(FieldPanel);
         FieldPanel.setLayout(FieldPanelLayout);
         FieldPanelLayout.setHorizontalGroup(
             FieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(FieldPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(GeneralInformation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(FieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(73, 73, 73)
-                .addComponent(jNextButton)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
             .addGroup(FieldPanelLayout.createSequentialGroup()
                 .addGap(10, 10, 10)
                 .addGroup(FieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1033,6 +1076,14 @@ public class DSSATMain extends javax.swing.JFrame {
                     .addComponent(BedSystemInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 623, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(SoilInfo, javax.swing.GroupLayout.PREFERRED_SIZE, 623, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(10, 10, 10))
+            .addGroup(FieldPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(GeneralInformation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(57, 57, 57)
+                .addGroup(FieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jNextButton)
+                    .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 236, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         FieldPanelLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {BedSystemInfo, CropInfo, SoilInfo, WeatherInfo});
@@ -1040,18 +1091,16 @@ public class DSSATMain extends javax.swing.JFrame {
         FieldPanelLayout.setVerticalGroup(
             FieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(FieldPanelLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(FieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(GeneralInformation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(FieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(FieldPanelLayout.createSequentialGroup()
-                        .addGap(14, 14, 14)
-                        .addGroup(FieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(FieldPanelLayout.createSequentialGroup()
-                                .addComponent(jButton1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jButton2))
-                            .addComponent(jNextButton))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(GeneralInformation, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18))
+                    .addGroup(FieldPanelLayout.createSequentialGroup()
+                        .addGap(25, 25, 25)
+                        .addComponent(jNextButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(8, 8, 8)))
                 .addGroup(FieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(WeatherInfo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(SoilInfo, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -1059,7 +1108,7 @@ public class DSSATMain extends javax.swing.JFrame {
                 .addGroup(FieldPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addComponent(CropInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
                     .addComponent(BedSystemInfo, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE))
-                .addContainerGap(83, Short.MAX_VALUE))
+                .addContainerGap(85, Short.MAX_VALUE))
         );
 
         FieldPanelLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {BedSystemInfo, CropInfo});
@@ -1092,6 +1141,24 @@ public class DSSATMain extends javax.swing.JFrame {
 
         jLabel58.setText("Irrigation Depth");
 
+        jFertilizerInfoTable.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null},
+                {null, null, null, null, null}
+            },
+            new String [] {
+                "Date", "Start Time", "Duration", "Interval", "Event Times"
+            }
+        ));
+        jFertilizerInfoTable.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jFertilizerInfoTableMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(jFertilizerInfoTable);
+
         javax.swing.GroupLayout pIrrigationPanelLayout = new javax.swing.GroupLayout(pIrrigationPanel);
         pIrrigationPanel.setLayout(pIrrigationPanelLayout);
         pIrrigationPanelLayout.setHorizontalGroup(
@@ -1099,31 +1166,34 @@ public class DSSATMain extends javax.swing.JFrame {
             .addGroup(pIrrigationPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(pIrrigationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addComponent(jLabel53, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel49, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel51, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel54, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel58, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addGap(40, 40, 40)
-                .addGroup(pIrrigationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField14, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField15, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField16, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jTextField17, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
-                .addGroup(pIrrigationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel50, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
-                    .addComponent(jLabel52, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel55, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel56, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel57, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)
+                    .addGroup(pIrrigationPanelLayout.createSequentialGroup()
+                        .addGroup(pIrrigationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(jLabel53, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel49, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel51, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel54, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel58, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(40, 40, 40)
+                        .addGroup(pIrrigationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField14, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField15, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField16, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextField17, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(18, 18, 18)
+                        .addGroup(pIrrigationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jLabel50, javax.swing.GroupLayout.DEFAULT_SIZE, 58, Short.MAX_VALUE)
+                            .addComponent(jLabel52, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel55, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel56, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel57, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
                 .addContainerGap(28, Short.MAX_VALUE))
         );
         pIrrigationPanelLayout.setVerticalGroup(
             pIrrigationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pIrrigationPanelLayout.createSequentialGroup()
-                .addGap(51, 51, 51)
+                .addGap(92, 92, 92)
                 .addGroup(pIrrigationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel49)
                     .addComponent(jLabel50)
@@ -1148,7 +1218,9 @@ public class DSSATMain extends javax.swing.JFrame {
                     .addComponent(jLabel58)
                     .addComponent(jTextField17, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel57))
-                .addContainerGap(193, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 50, Short.MAX_VALUE)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(31, 31, 31))
         );
 
         pFertilizerPanel.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Fertilizer", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Agency FB", 3, 16), new java.awt.Color(0, 0, 255))); // NOI18N
@@ -1165,24 +1237,6 @@ public class DSSATMain extends javax.swing.JFrame {
         jLabel62.setText("Fertilization Method");
 
         jLabel63.setText("Fertilization Date");
-
-        jFertilizerInfoTable.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null},
-                {null, null, null, null}
-            },
-            new String [] {
-                "Fertilization Date", "Fertilization Material", "Fertilization Method", "Rate Per Application"
-            }
-        ));
-        jFertilizerInfoTable.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jFertilizerInfoTableMouseClicked(evt);
-            }
-        });
-        jScrollPane2.setViewportView(jFertilizerInfoTable);
 
         bAdd.setText("Add");
         bAdd.addActionListener(new java.awt.event.ActionListener() {
@@ -1207,51 +1261,67 @@ public class DSSATMain extends javax.swing.JFrame {
 
         warningMessaage.setForeground(new java.awt.Color(255, 0, 0));
 
+        jFertilizerInfoTable1.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null},
+                {null, null, null, null}
+            },
+            new String [] {
+                "Fertilization Date", "Fertilization Material", "Fertilization Method", "Rate Per Application"
+            }
+        ));
+        jFertilizerInfoTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jFertilizerInfoTable1MouseClicked(evt);
+            }
+        });
+        jScrollPane3.setViewportView(jFertilizerInfoTable1);
+
         javax.swing.GroupLayout pFertilizerPanelLayout = new javax.swing.GroupLayout(pFertilizerPanel);
         pFertilizerPanel.setLayout(pFertilizerPanelLayout);
         pFertilizerPanelLayout.setHorizontalGroup(
             pFertilizerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pFertilizerPanelLayout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(pFertilizerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pFertilizerPanelLayout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)
-                        .addContainerGap())
+                        .addGap(87, 87, 87)
+                        .addGroup(pFertilizerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel62, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel61, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel63)
+                            .addComponent(jLabel60)))
                     .addGroup(pFertilizerPanelLayout.createSequentialGroup()
+                        .addGap(38, 38, 38)
+                        .addComponent(bAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30)
+                        .addComponent(bUpdate)))
+                .addGroup(pFertilizerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pFertilizerPanelLayout.createSequentialGroup()
+                        .addGap(62, 62, 62)
                         .addGroup(pFertilizerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(pFertilizerPanelLayout.createSequentialGroup()
-                                .addGap(77, 77, 77)
-                                .addGroup(pFertilizerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel62, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel61, javax.swing.GroupLayout.PREFERRED_SIZE, 114, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel63)
-                                    .addComponent(jLabel60)))
-                            .addGroup(pFertilizerPanelLayout.createSequentialGroup()
-                                .addGap(28, 28, 28)
-                                .addComponent(bAdd, javax.swing.GroupLayout.PREFERRED_SIZE, 77, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(30, 30, 30)
-                                .addComponent(bUpdate)))
-                        .addGroup(pFertilizerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pFertilizerPanelLayout.createSequentialGroup()
-                                .addGap(62, 62, 62)
-                                .addGroup(pFertilizerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(pFertilizerPanelLayout.createSequentialGroup()
-                                        .addComponent(jTextRatePerApplication, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addGap(18, 18, 18)
-                                        .addComponent(jLabel59, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGap(55, 55, 55))
-                                    .addComponent(jComboBoxFertMethod, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jComboBoxFertMaterial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jDateChooser3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                                .addGap(28, 28, 28))
-                            .addGroup(pFertilizerPanelLayout.createSequentialGroup()
-                                .addGap(30, 30, 30)
-                                .addComponent(bDelete)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                                .addComponent(jTextRatePerApplication, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jLabel59, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(55, 55, 55))
+                            .addComponent(jComboBoxFertMethod, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jComboBoxFertMaterial, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jDateChooser3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(28, 28, 28))
                     .addGroup(pFertilizerPanelLayout.createSequentialGroup()
-                        .addGap(28, 28, 28)
-                        .addComponent(warningMessaage, javax.swing.GroupLayout.PREFERRED_SIZE, 485, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(30, 30, 30)
+                        .addComponent(bDelete)
                         .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+            .addGroup(pFertilizerPanelLayout.createSequentialGroup()
+                .addGap(38, 38, 38)
+                .addComponent(warningMessaage, javax.swing.GroupLayout.PREFERRED_SIZE, 485, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(49, Short.MAX_VALUE))
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pFertilizerPanelLayout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 552, Short.MAX_VALUE)
+                .addContainerGap())
         );
         pFertilizerPanelLayout.setVerticalGroup(
             pFertilizerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1282,9 +1352,9 @@ public class DSSATMain extends javax.swing.JFrame {
                     .addComponent(bDelete))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(warningMessaage, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(7, 7, 7)
-                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(343, 343, 343))
+                .addGap(93, 93, 93)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.PREFERRED_SIZE, 112, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(257, 257, 257))
         );
 
         bFinishButton.setFont(new java.awt.Font("Tahoma", 1, 18)); // NOI18N
@@ -1319,11 +1389,11 @@ public class DSSATMain extends javax.swing.JFrame {
         pButtonPanelLayout.setVerticalGroup(
             pButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pButtonPanelLayout.createSequentialGroup()
-                .addGap(20, 20, 20)
+                .addContainerGap()
                 .addGroup(pButtonPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(bBackButton)
                     .addComponent(bFinishButton))
-                .addContainerGap(43, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout IrrigationFertilizerPanelLayout = new javax.swing.GroupLayout(IrrigationFertilizerPanel);
@@ -1333,24 +1403,27 @@ public class DSSATMain extends javax.swing.JFrame {
             .addGroup(IrrigationFertilizerPanelLayout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(IrrigationFertilizerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, IrrigationFertilizerPanelLayout.createSequentialGroup()
+                        .addComponent(pButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(36, 36, 36))
                     .addGroup(IrrigationFertilizerPanelLayout.createSequentialGroup()
                         .addComponent(pIrrigationPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(18, 18, 18)
-                        .addComponent(pFertilizerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, IrrigationFertilizerPanelLayout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 750, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(pButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(29, 29, 29)))
-                .addContainerGap())
+                        .addGroup(IrrigationFertilizerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(pFertilizerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap())))
         );
         IrrigationFertilizerPanelLayout.setVerticalGroup(
             IrrigationFertilizerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(IrrigationFertilizerPanelLayout.createSequentialGroup()
                 .addContainerGap()
+                .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(IrrigationFertilizerPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(pIrrigationPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pFertilizerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 445, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
+                    .addComponent(pFertilizerPanel, javax.swing.GroupLayout.PREFERRED_SIZE, 486, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(pButtonPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
@@ -1548,12 +1621,12 @@ public class DSSATMain extends javax.swing.JFrame {
             weatherStComboBox.removeItemAt(0);
         }
 
-        CSVFileHandler csvfilehandler = new CSVFileHandler ();
+        //CSVFileHandler csvfilehandler = new CSVFileHandler ();
         Location countypos = new Location ();
-        csvfilehandler.getCountyLocation_GlobalDB (countyName, countypos);
+        mycsvfile.getCountyLocation_GlobalDB (countyName, countypos);
 
         ArrayList<String> weatherstations = null;
-        weatherstations = csvfilehandler.getWeatherStations_GlobalDB(countypos);
+        weatherstations = mycsvfile.getWeatherStations_GlobalDB(countypos);
         Collections.sort(weatherstations);
         
         System.out.println("Total Number of Fawn Weather Stations = " + weatherstations.size() + " for " + countyName);
@@ -1571,7 +1644,7 @@ public class DSSATMain extends javax.swing.JFrame {
         //String countyName = (String) soilInfoCountyCombobox.getSelectedItem();
         //soilList = soil_db.getCountyBasedSoilList_SoilDB(countyName);
         //CSVFileHandler csvfilehandler = new CSVFileHandler();
-        soilList = csvfilehandler.getCountyBasedSoilList_SoilDB(countyName);
+        soilList = mycsvfile.getCountyBasedSoilList_SoilDB(countyName);
 
         int soilitemCount = soilSeriesCombobox.getItemCount();
         for(int i=0;i<soilitemCount;i++){
@@ -1596,10 +1669,13 @@ public class DSSATMain extends javax.swing.JFrame {
     }//GEN-LAST:event_jNextButtonActionPerformed
 
     private void jNextButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jNextButtonMouseClicked
-        UpdateFile ();
-        FieldPanel.setVisible(false);
-        IrrigationFertilizerPanel.setVisible(true);      
-   
+        if (UpdateFile () == true ) {
+            jLabel2.setText("");
+            FieldPanel.setVisible(false);
+            IrrigationFertilizerPanel.setVisible(true);      
+        } else {
+            jLabel2.setText("Please update necessary information.");
+        }
     }//GEN-LAST:event_jNextButtonMouseClicked
 
     private void jComboBoxCropListActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBoxCropListActionPerformed
@@ -1670,6 +1746,13 @@ public class DSSATMain extends javax.swing.JFrame {
         // TODO add your handling code here:
         LOGGER.log(Level.ALL, "Creating a Weather file after Finish Button is pressed ...");
         String keyvalue = "dssat, dssat1";
+        
+        // First check if all the necessary data is available in the window or not. 
+        if (ValidateFram2Data () == false){
+            return;
+        }
+        
+        
         if (wthfile == null)
         wthfile = WeatherFileSystem.getInstance();
         wthfile.UpdateCache(keyvalue);
@@ -1677,9 +1760,68 @@ public class DSSATMain extends javax.swing.JFrame {
         LOGGER.log(Level.ALL, "Created a Weather file after Finish Button is pressed ...");
     }//GEN-LAST:event_bFinishButtonActionPerformed
 
+   private boolean ValidateFram2Data (){
+       
+        boolean isSuccess = true;        
+        String str = new String ("");       
+ 		
+        str = jTextField17.getText(); 
+        if (str.trim().isEmpty()) {
+            jLabel58.setForeground(Color.red);
+            isSuccess = false;
+        } else {
+            jLabel58.setForeground(Color.BLACK);
+            
+        }
+        
+        str = jTextField16.getText(); 
+        if (str.trim().isEmpty()) {
+            jLabel54.setForeground(Color.red);
+            isSuccess = false;
+        } else {
+            jLabel54.setForeground(Color.BLACK);
+            
+        }
+        
+        str = jTextField15.getText(); 
+        if (str.trim().isEmpty()) {
+            jLabel53.setForeground(Color.red);
+            isSuccess = false;
+        } else {
+            jLabel53.setForeground(Color.BLACK);
+        }
+       
+        str = jTextField1.getText(); 
+        if (str.trim().isEmpty()) {
+            jLabel49.setForeground(Color.red);
+            isSuccess = false;
+        } else {
+            jLabel49.setForeground(Color.BLACK);
+        }
+    
+        str = jTextField14.getText(); 
+        if (str.trim().isEmpty()) {
+            jLabel51.setForeground(Color.red);
+            isSuccess = false;
+        } else {
+            jLabel51.setForeground(Color.BLACK);
+        }    
+        
+        return isSuccess;
+    }
+   
+    private void ResetForeGround () {        
+        jLabel49.setForeground(Color.BLACK);
+        jLabel51.setForeground(Color.BLACK);
+        jLabel58.setForeground(Color.BLACK);
+        jLabel54.setForeground(Color.BLACK);
+        jLabel53.setForeground(Color.BLACK);
+    }
+    
+    
     private void bBackButtonMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_bBackButtonMouseClicked
         // TODO add your handling code here:
-
+        ResetForeGround ();
         IrrigationFertilizerPanel.setVisible(false);
         FieldPanel.setVisible(true);
 
@@ -2008,17 +2150,112 @@ public class DSSATMain extends javax.swing.JFrame {
 //        }
     }//GEN-LAST:event_jSplitPane1MouseDragged
 
-    private void UpdateFile () {
+    private void jButtonOpenWeatherFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonOpenWeatherFileActionPerformed
+        // TODO add your handling code here:
+        String filepath = curdirpath + "\\data\\Alachuanull1501.WTH";
+        OpenTxtFileEditor (filepath);
+    }//GEN-LAST:event_jButtonOpenWeatherFileActionPerformed
+
+    private void jButtonDisplaySoilFileActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonDisplaySoilFileActionPerformed
+        // TODO add your handling code here:
+        GenerateSoilData ();
+        String countyName = (String)countyNameGlobal.getSelectedItem(); 
+        String soilName = (String)soilSeriesCombobox.getSelectedItem();
+        String soildid = mycsvfile.getSoilid(countyName, soilName);
+        String filepath = curdirpath + countyName+soildid+".SOL";        
+        OpenTxtFileEditor (filepath);       
+    }//GEN-LAST:event_jButtonDisplaySoilFileActionPerformed
+
+    private void jSiteNameTextKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jSiteNameTextKeyTyped
+    }//GEN-LAST:event_jSiteNameTextKeyTyped
+
+    private void jFertilizerInfoTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jFertilizerInfoTable1MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jFertilizerInfoTable1MouseClicked
+
+    private void OpenTxtFileEditor (String filepath) {
+        
+        try {         
+            if (System.getProperty("os.name").toLowerCase().contains("windows")) {         
+                String cmds[] = new String[] { "notepad", filepath};
+                Runtime.getRuntime().exec(cmds);
+            } 
+            else {
+                File file = new File(filepath);                  
+                Desktop.getDesktop().edit(file);
+            }           
+        }
+        catch (Exception e) {
+            System.out.println(e);
+        } 
+    }
+    
+    private boolean UpdateFile () {
         
         LOGGER.log(Level.ALL, "Updating the cache with the latest information...");
         
         StringBuilder   weatherdata = new StringBuilder ("");
-        if (wthfile == null)
-            wthfile = WeatherFileSystem.getInstance();
+        String          str = new String ("");
+        boolean         isSuccess = true;
+        
+        if (wthfile == null) {
+            wthfile = WeatherFileSystem.getInstance();  
+        }
+        
         
         weatherdata.append ("Site,");
-        weatherdata.append(jSiteNameText.getText() + ",");
+        str = jSiteNameText.getText();
         
+        if (!str.isEmpty()) {
+            weatherdata.append(str + ",");
+        } else {
+            isSuccess = false;
+        }
+        
+        str = jTextField2.getText(); 
+        if (str.trim().isEmpty()) {
+            jLabel11.setForeground(Color.red);
+            isSuccess = false;
+        } else {
+            jLabel11.setForeground(Color.BLACK);
+        }
+        str = jTextField6.getText(); 
+        if (str.trim().isEmpty()) {
+            jLabel12.setForeground(Color.red);
+            isSuccess = false;
+        } else {
+            jLabel12.setForeground(Color.BLACK);
+        }
+        str = (String)jComboBox7.getSelectedItem();
+        if (str.trim().isEmpty()) {
+            jLabel13.setForeground(Color.red);
+            isSuccess = false;
+        } else {
+            jLabel13.setForeground(Color.BLACK);
+        }
+        str = jTextField4.getText();
+        if (str.trim().isEmpty()) {
+            jLabel17.setForeground(Color.red);
+            isSuccess = false;
+        } else {
+            jLabel17.setForeground(Color.BLACK);
+        }
+        str = jTextField5.getText();
+        if (str.trim().isEmpty()) {
+            jLabel18.setForeground(Color.red);
+            isSuccess = false;
+        } else {
+            jLabel18.setForeground(Color.BLACK);
+        }
+        str = jTextField3.getText();
+        if (str.trim().isEmpty()) {
+            jLabel16.setForeground(Color.red);
+            isSuccess = false;
+        } else {
+            jLabel16.setForeground(Color.BLACK);
+        }
+        
+        /******************************Setup date related information******************/
         Date date = jDateChooser1.getDate();        
         Calendar calendar = new GregorianCalendar();
         calendar.setTime(date);
@@ -2034,7 +2271,7 @@ public class DSSATMain extends javax.swing.JFrame {
                      
         
         //System.out.println ("Hello This is rohit - " + day + "//" + month + "//"+  year);
-        CSVFileHandler filehandler = new CSVFileHandler ();
+        //CSVFileHandler filehandler = new CSVFileHandler ();
         weatherdata.append ("PlantingMonth,");
         //weatherdata.append ((String) jPlantingMonthComboBox.getSelectedItem() + ",");
         weatherdata.append (monthstr + ",");
@@ -2052,12 +2289,20 @@ public class DSSATMain extends javax.swing.JFrame {
         weatherdata.append (watherstation + ",");  
         
         weatherdata.append ("StationLocationId,");        
-        weatherdata.append(filehandler.getWeatherStationId_GlobalDB (watherstation));
+        weatherdata.append(mycsvfile.getWeatherStationId_GlobalDB (watherstation));
         
-        System.out.println("Weather Data -" + weatherdata);
-        wthfile.UpdateCache(weatherdata.toString());         
+         /******************************Setup date related information******************/
+        
+        //System.out.println("Weather Data -" + weatherdata);
+        
+        // If all the necessary data is available only then this will update the cache
+        if (isSuccess == true) {
+            wthfile.UpdateCache(weatherdata.toString());         
+        }
         
         LOGGER.log(Level.ALL, "Updated the cache with the latest information...");
+        
+        return isSuccess;
     }
     
     /*private void UpdateFile () {
@@ -2190,8 +2435,8 @@ public class DSSATMain extends javax.swing.JFrame {
     private javax.swing.JTextField jBlockNameText;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JButton jButton3;
-    private javax.swing.JButton jButton4;
+    private javax.swing.JButton jButtonDisplaySoilFile;
+    private javax.swing.JButton jButtonOpenWeatherFile;
     private javax.swing.JComboBox jComboBox7;
     private javax.swing.JComboBox jComboBoxCropList;
     private javax.swing.JComboBox jComboBoxCultivar;
@@ -2202,6 +2447,7 @@ public class DSSATMain extends javax.swing.JFrame {
     private com.toedter.calendar.JDateChooser jDateChooser1;
     private com.toedter.calendar.JDateChooser jDateChooser3;
     private javax.swing.JTable jFertilizerInfoTable;
+    private javax.swing.JTable jFertilizerInfoTable1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel12;
@@ -2212,6 +2458,7 @@ public class DSSATMain extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel17;
     private javax.swing.JLabel jLabel18;
     private javax.swing.JLabel jLabel19;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel20;
     private javax.swing.JLabel jLabel21;
     private javax.swing.JLabel jLabel23;
@@ -2220,6 +2467,7 @@ public class DSSATMain extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel27;
     private javax.swing.JLabel jLabel28;
     private javax.swing.JLabel jLabel29;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel30;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel49;
@@ -2261,6 +2509,7 @@ public class DSSATMain extends javax.swing.JFrame {
     private javax.swing.JTree jProjectExplorer;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JPopupMenu.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator2;
     private javax.swing.JTextField jSiteNameText;
